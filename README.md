@@ -452,3 +452,6 @@ Password will remain hidden
 
 Press enter to continue
 ```
+
+##Issues & Pull requests
+Feel free to open up an issue if you have any problems. Also feel free to submit pull requests.
