@@ -255,7 +255,7 @@ Viewing passwords
 
 To view a password, you have to be in the 'Passwordmaanger menu'. Then hit the 1 'Show all stored entries'.
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
+  ┌─────────────────────────────────────────────────────────────────────────┐
   │                                                                         │
   │  Passwordmanager menu                                                   │
   │                                                                         │
