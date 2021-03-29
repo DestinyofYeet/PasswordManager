@@ -176,7 +176,7 @@ From the main menu hit the 2 for the 'Passwordmanager menu'.
 Since you now have the database selected you can now create an entry!
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
+  ┌─────────────────────────────────────────────────────────────────────────┐
   │                                                                         │
   │  Passwordmanager menu                                                   │
   │                                                                         │
