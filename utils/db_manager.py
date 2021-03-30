@@ -48,8 +48,11 @@ class Database:
         if type(content) == str:
             content.encode()
 
+        with open(self.db_path + ".salt", "rb") as f:
+            salt = f.read()
+
         content_to_write = json.dumps(content, indent=2).encode()
-        key = encryptor.generate_key_using_password(self.password)
+        key, salt = encryptor.generate_key_using_password(self.password, salt)
         fernet = Fernet(key)
         real_content_to_write = fernet.encrypt(content_to_write)
         with open(self.db_path, "wb") as f:

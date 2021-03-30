@@ -13,7 +13,10 @@ def get_decrypted_content(password, filepath=os.path.abspath('databases/database
     with open(filepath, 'rb') as f:
         data = f.read()
 
-    key = encryptor.generate_key_using_password(password)
+    with open(filepath + ".salt", "rb") as f:
+        salt = f.read()
+
+    key, salt = encryptor.generate_key_using_password(password, salt)
     fernet = Fernet(key)
     unencrypted_data = fernet.decrypt(data)
 

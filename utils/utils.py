@@ -71,12 +71,15 @@ def __generate_database__(password, filepath) -> bool:
             elif check.lower() == 'n':
                 return False
 
-    key = encryptor.generate_key_using_password(password)
+    key, salt = encryptor.generate_key_using_password(password)
 
     fernet = Fernet(key)
     encrypted_data = fernet.encrypt(b'{}')
     with open(filepath, 'wb+') as f:
         f.write(encrypted_data)
+
+    with open(filepath + ".salt", "wb+") as f:
+        f.write(salt)
 
     print(f"Created .db file in '{filepath}'")
     return True
