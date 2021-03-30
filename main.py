@@ -12,13 +12,15 @@ database = None
 
 
 def register_database(database_path):
+    # stores the saved paths in %appdata%\.pwmanager\registers.json
     path = os.getenv("appdata")
+    # if it doesn't exist, create it
     if not os.path.exists(f"{path}\\.pwmanager\\"):
         os.mkdir(f"{path}\\.pwmanager\\")
         with open(f"{path}\\.pwmanager\\register.json", "w+") as f:
             json.dump({1: database_path}, f, indent=2)
         return
-
+    # if register.json doesn't exist, create it
     if not os.path.exists(f"{path}\\.pwmanager\\register.json"):
         with open(f"{path}\\.pwmanager\\register.json", "w+") as f:
             json.dump({1: database_path}, f, indent=2)
@@ -39,6 +41,9 @@ def register_database(database_path):
 
 
 def database_enable():
+    """
+    This will 'select' a database for use
+    """
     global database
     path = os.getenv("appdata") + "\\.pwmanager\\register.json"
     if not os.path.exists(path):
@@ -73,6 +78,9 @@ def database_enable():
 
 
 def database_setup():
+    """
+    this will create a database
+    """
     print("Input 'quit' to go back to the menu\n")
     database_path = input("Input the full path to the database folder: ")
     if database_path in ['q', 'quit']:
@@ -95,6 +103,9 @@ def database_setup():
 
 
 def check_selected_database():
+    """
+    This is responsible for checking if a database has been selected
+    """
     global database
     if not isinstance(database, db_manager.Database):
         print("You have no database selected")
@@ -105,6 +116,10 @@ def check_selected_database():
 
 
 def show_database_entries():
+    """
+    This is the wrapper function for the database.show_all_entries() function since database has to be set in order for
+    this to work
+    """
     global database
     if not isinstance(database, db_manager.Database):
         print("Database not initialized yet! Please select a database to read from from the database menu!")
@@ -115,6 +130,10 @@ def show_database_entries():
 
 
 def create_database_entry():
+    """
+    This is the wrapper function for the database.add_password() function since database has to be set in order for
+    this to work
+    """
     global database
     if not isinstance(database, db_manager.Database):
         print("Database not initialized yet! Please select a database to read from from the database menu!")
@@ -125,6 +144,9 @@ def create_database_entry():
 
 
 def modify_database_entry():
+    """
+    This is the wrapper function for database.modify_entry() since database has to be set in order for this to work
+    """
     global database
     if not isinstance(database, db_manager.Database):
         print("Database not initialized yet! Please select a database to read from from the database menu!")
@@ -135,6 +157,9 @@ def modify_database_entry():
 
 
 def about():
+    """
+    Some about info
+    """
     print("About: \n")
     print("Coded by DestinyofYeet")
     print("Github: https://github.com/DestinyofYeet/PasswordManager")
@@ -143,22 +168,28 @@ def about():
 
 if __name__ == '__main__':
 
+    # Creates the main Menu
     menu = ConsoleMenu(f"Passwordmanager UI", "Select an option!")
 
+    # Creates the submenu 'Passwordmanager menu'
     password_stuff = ConsoleMenu("Passwordmanager menu", "Select an option!")
     password_stuff_submenu = SubmenuItem("Passwordmanager menu", password_stuff, menu)
 
+    # Creates the individual components of the submenu 'Passwordmanager menu'
     password_stuff.append_item(FunctionItem("Show all stored entries", show_database_entries))
     password_stuff.append_item(FunctionItem("Add database entry", create_database_entry))
     password_stuff.append_item(FunctionItem("Modify database entry", modify_database_entry))
 
+    # Creates the submenu 'Database menu'
     database_stuff = ConsoleMenu(f"Database menu", "Select an option!")
     database_stuff_submenu = SubmenuItem("Database Menu", database_stuff, menu)
 
+    # Creates the individual components of the submenu 'Database menu'
     database_stuff.append_item(FunctionItem("Create a new database", database_setup))
     database_stuff.append_item(FunctionItem("Select a database to read from", database_enable))
     database_stuff.append_item(FunctionItem("Check selected database", check_selected_database))
 
+    # Everything gets added to the main Menu
     menu.append_item(database_stuff_submenu)
     menu.append_item(password_stuff_submenu)
     menu.append_item(FunctionItem("About", about))

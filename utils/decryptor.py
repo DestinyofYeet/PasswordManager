@@ -4,6 +4,12 @@ import os
 
 
 def get_decrypted_content(password, filepath=os.path.abspath('databases/database.db')) -> str:
+    """
+    Returns the unencrypted content of the database file
+    :param password:
+    :param filepath:
+    :return: Decrypted content of the database file
+    """
     with open(filepath, 'rb') as f:
         data = f.read()
 

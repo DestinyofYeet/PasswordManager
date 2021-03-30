@@ -7,6 +7,11 @@ import os
 
 
 def generate_key_using_password(password) -> bytes:
+    """
+    This function generates a key to the corresponding password
+    :param password:
+    :return: A generated key using a password
+    """
     byte_password = password.encode()
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
@@ -18,7 +23,13 @@ def generate_key_using_password(password) -> bytes:
     return base64.urlsafe_b64encode(kdf.derive(byte_password))
 
 
-def encrypt_file(key, filepath):
+def encrypt_file(key, filepath) -> None:
+    """
+    This function encrypts a file with the corresponding key
+    :param key:
+    :param filepath:
+    :return:
+    """
     with open(filepath, 'rb') as f:
         data = f.read()
 

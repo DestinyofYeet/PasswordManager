@@ -9,6 +9,11 @@ import json
 
 
 def confirm(input_):
+    """
+    Just some small helper function to help with converting yes or no input into True and False
+    :param input_:
+    :return: bool
+    """
     if input_.lower() in ['y', 'yes']:
         return True
     elif input_.lower() in ['n', 'no']:
@@ -17,11 +22,19 @@ def confirm(input_):
         return None
 
 
-def clear_screen():
+def clear_screen() -> None:
+    """
+    Clears the screen. Will be expanded to also be usable on linux
+    """
     os.system("cls")
 
 
-def create_database(filepath=os.path.abspath('databases/database.db')):
+def create_database(filepath=os.path.abspath('databases/database.db')) -> None:
+    """
+    Wrapper function for __generate_database__
+    :param filepath:
+    :return:
+    """
     password = getpass("Please enter the password to create the database with: ")
     confirm_password = getpass("Please confirm your password: ")
     if password != confirm_password:
@@ -35,14 +48,21 @@ def create_database(filepath=os.path.abspath('databases/database.db')):
 
 
 def __generate_database__(password, filepath) -> bool:
+    """
+    Will setup the database. Gets called from create_database
+    :param password:
+    :param filepath:
+    :return: Success
+    """
 
+    # asking for file overwriting
     if os.path.exists(filepath):
         while True:
-            confirm = input("The file specified already exists, do you want to overwrite the file? y/n: ")
-            if confirm.lower() == 'y':
+            check = input("The file specified already exists, do you want to overwrite the file? y/n: ")
+            if check.lower() == 'y':
                 break
 
-            elif confirm.lower() == 'n':
+            elif check.lower() == 'n':
                 return False
 
     key = encryptor.generate_key_using_password(password)
@@ -58,6 +78,10 @@ def __generate_database__(password, filepath) -> bool:
 
 class Database:
     def __init__(self, db_path=os.path.abspath('databases/database.db')):
+        """
+        Gets everything ready to store and read data.
+        :param db_path:
+        """
         self.db_path = db_path
         self.password = getpass(prompt="Input your database password: ")
         sys.stdout.write("Checking password...")
@@ -72,13 +96,22 @@ class Database:
             exit(1)
 
     def __check_password__(self) -> bool:
+        """
+        Checks if the password given is the correct one by attempting to decrypt it
+        :return: Success of decryption
+        """
         try:
             decryptor.get_decrypted_content(self.password, self.db_path)
             return True
         except InvalidToken:
             return False
 
-    def __save_file__(self, content):
+    def __save_file__(self, content) -> None:
+        """
+        Gets the json file (byte or string), encrypts it and slaps it in the file
+        :param content:
+        :return:
+        """
         if type(content) == str:
             content.encode()
 
@@ -89,11 +122,17 @@ class Database:
         with open(self.db_path, "wb") as f:
             f.write(real_content_to_write)
 
-    def add_password(self):
+    def add_password(self) -> None:
+        """
+        This will add a entry in the database
+        :return:
+        """
         print("If you type in 'q' or 'quit' in the 'Website or usage' field, the program will abort the adding and go back to the menu\n")
         website_or_usage = input("Website or usage: ")
         if website_or_usage in ['q', 'quit']:
             return
+
+        # assures a key so that it can't be emtpy
         while not website_or_usage:
             website_or_usage = input("Website or usage: ")
         username = input("Username: ")
@@ -115,6 +154,7 @@ class Database:
 
         db_content = decryptor.get_decrypted_content(self.password, self.db_path)
         passwords = json.loads(db_content)
+
         # checking if the key is already there
         try:
             passwords[website_or_usage]
@@ -138,7 +178,11 @@ class Database:
         print("Added password!")
         input("\nEnter to continue")
 
-    def real_show_all_entries(self):
+    def real_show_all_entries(self) -> None:
+        """
+        Prints all entries to the screen
+        :return:
+        """
         entries = json.loads(decryptor.get_decrypted_content(self.password, self.db_path))
         if len(entries.keys()) == 0:
             print("No entries yet! Go create some.")
@@ -149,7 +193,11 @@ class Database:
             print(f"- {i}")
         print()
 
-    def show_all_entries(self):
+    def show_all_entries(self) -> None:
+        """
+        Can more specifics about a dataset, like username, description and password
+        :return:
+        """
         # loads the entries and checks if there are any
         entries = json.loads(decryptor.get_decrypted_content(self.password, self.db_path))
         if len(entries.keys()) == 0:
@@ -183,12 +231,20 @@ class Database:
                         print("You don't have an entry with that title!")
                         input("\nPress enter to continue")
 
-            os.system("cls")
+            clear_screen()
 
-    def get_path(self):
+    def get_path(self) -> str:
+        """
+        Returns the path to the current selected database file
+        :return: Path to the current selected database file
+        """
         return self.db_path
 
-    def modify_entry(self):
+    def modify_entry(self) -> None:
+        """
+        Allows a modification of an entry
+        :return:
+        """
         entries = json.loads(decryptor.get_decrypted_content(self.password, self.db_path))
         if len(entries.keys()) == 0:
             print("No entries yet! Go create some.")
@@ -218,6 +274,7 @@ class Database:
                     if new_password:
                         confirm_new_password = getpass("Confirm new password: ")
 
+                    # checks till a) passwords are the same or b) user didn't want to change the passwords
                     while new_password != confirm_new_password:
                         check = input("The passwords don't match. Do you want to re-enter both? y/n: ")
                         check = confirm(check)
@@ -232,7 +289,7 @@ class Database:
                     if new_password:
                         print("Passwords match")
 
-                    title_gets_updated = False
+                    title_gets_updated = False  # use of an extra variable to keep the modification in order: 1. Title 2. username etc...
 
                     if new_title:
                         check = None
