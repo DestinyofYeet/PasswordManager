@@ -1,79 +1,12 @@
-from utils import encryptor
-from utils import decryptor
+from . import encryptor
+from . import decryptor
+from . import utils
 from cryptography.fernet import Fernet
 from cryptography.fernet import InvalidToken
 from stdiomask import getpass
 import os
 import sys
 import json
-
-
-def confirm(input_):
-    """
-    Just some small helper function to help with converting yes or no input into True and False
-    :param input_:
-    :return: bool
-    """
-    if input_.lower() in ['y', 'yes']:
-        return True
-    elif input_.lower() in ['n', 'no']:
-        return False
-    else:
-        return None
-
-
-def clear_screen() -> None:
-    """
-    Clears the screen. Will be expanded to also be usable on linux
-    """
-    os.system("cls")
-
-
-def create_database(filepath=os.path.abspath('databases/database.db')) -> None:
-    """
-    Wrapper function for __generate_database__
-    :param filepath:
-    :return:
-    """
-    password = getpass("Please enter the password to create the database with: ")
-    confirm_password = getpass("Please confirm your password: ")
-    if password != confirm_password:
-        print("Passwords aren't the same, aborting!")
-        return
-    success = __generate_database__(password, filepath)
-    if success:
-        print(f"Successfully created a database with the password specified")
-    else:
-        print("Failed to create database")
-
-
-def __generate_database__(password, filepath) -> bool:
-    """
-    Will setup the database. Gets called from create_database
-    :param password:
-    :param filepath:
-    :return: Success
-    """
-
-    # asking for file overwriting
-    if os.path.exists(filepath):
-        while True:
-            check = input("The file specified already exists, do you want to overwrite the file? y/n: ")
-            if check.lower() == 'y':
-                break
-
-            elif check.lower() == 'n':
-                return False
-
-    key = encryptor.generate_key_using_password(password)
-
-    fernet = Fernet(key)
-    encrypted_data = fernet.encrypt(b'{}')
-    with open(filepath, 'wb+') as f:
-        f.write(encrypted_data)
-
-    print(f"Created .db file in '{filepath}'")
-    return True
 
 
 class Database:
@@ -129,7 +62,7 @@ class Database:
         """
         print("If you type in 'q' or 'quit' in the 'Website or usage' field, the program will abort the adding and go back to the menu\n")
         website_or_usage = input("Website or usage: ")
-        if website_or_usage in ['q', 'quit']:
+        if utils.should_quit(website_or_usage):
             return
 
         # assures a key so that it can't be emtpy
@@ -157,7 +90,7 @@ class Database:
 
         # checking if the key is already there
         try:
-            passwords[website_or_usage]
+            _ = passwords[website_or_usage]
             while True:
                 check = input(f"There is already an entry titled '{website_or_usage}', are you sure you want to overwrite it? y/n: ")
                 if check.lower() in ['n', 'no']:
@@ -210,7 +143,7 @@ class Database:
             self.real_show_all_entries()
             more_information_on = input("More information on: ").strip()
             if more_information_on:
-                if more_information_on in ["q", "quit"]:
+                if utils.should_quit(more_information_on):
                     break
                 else:
                     try:
@@ -231,7 +164,7 @@ class Database:
                         print("You don't have an entry with that title!")
                         input("\nPress enter to continue")
 
-            clear_screen()
+            utils.clear_screen()
 
     def get_path(self) -> str:
         """
@@ -254,7 +187,7 @@ class Database:
             print("You will now be listed all entries of your database. Select one and copy it below to modify it. Type in 'quit' to get back to the menu")
             self.real_show_all_entries()
             entry_to_modify = input("Entry to modify: ")
-            if entry_to_modify in ['q', 'quit']:
+            if utils.should_quit(entry_to_modify):
                 break
             if entry_to_modify:
                 try:
@@ -277,7 +210,7 @@ class Database:
                     # checks till a) passwords are the same or b) user didn't want to change the passwords
                     while new_password != confirm_new_password:
                         check = input("The passwords don't match. Do you want to re-enter both? y/n: ")
-                        check = confirm(check)
+                        check = utils.confirm(check)
                         if isinstance(check, bool):
                             if check is False:
                                 new_password = ""
@@ -295,7 +228,7 @@ class Database:
                         check = None
                         while check is None:
                             check = input("Are you sure to update the title? y/n: ")
-                            check = confirm(check)
+                            check = utils.confirm(check)
                         if check is True:
                             title_gets_updated = True
                             entries[new_title] = entries[entry_to_modify]
@@ -309,7 +242,7 @@ class Database:
                         check = None
                         while check is None:
                             check = input("Are you sure to update the username? y/n: ")
-                            check = confirm(check)
+                            check = utils.confirm(check)
                         if check is True:
                             if not title_gets_updated:
                                 entry_to_modify_entry['username'] = new_username
@@ -324,7 +257,7 @@ class Database:
                         check = None
                         while check is None:
                             check = input("Are you sure to update the description? y/n: ")
-                            check = confirm(check)
+                            check = utils.confirm(check)
                         if check is True:
                             if not title_gets_updated:
                                 entry_to_modify_entry['description'] = new_description
@@ -339,7 +272,7 @@ class Database:
                         check = None
                         while check is None:
                             check = input("Are you sure to update the password? y/n: ")
-                            check = confirm(check)
+                            check = utils.confirm(check)
                         if check is True:
                             if not title_gets_updated:
                                 entry_to_modify_entry['password'] = new_password
@@ -357,4 +290,52 @@ class Database:
                     print("You don't have a entry titled like that!")
 
                 input("\nEnter to continue")
-                clear_screen()
+                utils.clear_screen()
+
+    def delete_entry(self) -> None:
+        """
+        This function has the ability to delete an entry
+        :return:
+        """
+        entries = json.loads(decryptor.get_decrypted_content(self.password, self.db_path))
+        while True:
+            if not utils.has_entries(entries):
+                return
+            print("You will now be listed all entries of your database. Select one and copy it below to delete it. Type in 'quit' to get back to the menu")
+            self.real_show_all_entries()
+            print()
+
+            entry_to_delete = input("Entry to delete: ")
+            if not entry_to_delete:
+                utils.clear_screen()
+                continue
+
+            if utils.should_quit(entry_to_delete):
+                return
+
+            try:
+                entries[entry_to_delete]
+            except KeyError:
+                print("You don't have an entry named like that!")
+                input("\nEnter to continue")
+                utils.clear_screen()
+                continue
+
+            print("\nEntry:\n")
+            print(f"Username: {entries[entry_to_delete]['username']}")
+            print(f"Description: {entries[entry_to_delete]['description']}")
+            print(f"Password: {len(entries[entry_to_delete]['password']) * '*'}\n")
+
+            check = None
+            while check is None:
+                check = utils.confirm(input(f"Are you sure you want to delete the entry '{entry_to_delete}'? y/n: "))
+
+            if check:
+                del entries[entry_to_delete]
+                self.__save_file__(entries)
+                print("Entry has been deleted")
+            else:
+                print("Deletion has been aborted")
+
+            input("\nEnter to continue")
+            utils.clear_screen()

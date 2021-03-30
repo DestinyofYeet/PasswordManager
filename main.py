@@ -7,8 +7,14 @@ import random
 import os
 
 from utils import db_manager
+from utils import utils
 
 database = None
+
+
+"""
+######################################### Database functions #########################################
+"""
 
 
 def register_database(database_path):
@@ -83,7 +89,7 @@ def database_setup():
     """
     print("Input 'quit' to go back to the menu\n")
     database_path = input("Input the full path to the database folder: ")
-    if database_path in ['q', 'quit']:
+    if utils.should_quit(database_path):
         return
     if not os.path.exists(database_path):
         confirm_creation = input("The folder specified doesn't exist! Should it be created? y/n: ")
@@ -98,7 +104,7 @@ def database_setup():
                 return
 
     register_database(database_path)
-    db_manager.create_database(database_path + "\\database.db")
+    utils.create_database(database_path + "\\database.db")
     input("\nEnter to continue")
 
 
@@ -113,6 +119,80 @@ def check_selected_database():
         print(f"Database is selected from path {database.get_path()}")
 
     input("\nEnter to continue")
+
+
+"""
+######################################### Non-wrapping password functions #########################################
+"""
+
+
+def password_generator() -> None:
+    """
+    Generates a password and printing it on the screen for the user to use
+    :return:
+    """
+    length_of_password = 0
+
+    while length_of_password == 0:
+        print("After specifying some options your generated password will be given to you. Type in 'quit' to quit\n")
+        try:
+            length_of_password_input = input("Enter the length of your password: ")
+            if utils.should_quit(length_of_password_input):
+                return
+            length_of_password = int(length_of_password_input)
+        except ValueError:
+            print("Invalid input! Try again.\n")
+            continue
+
+    lowercase_check = None
+
+    while lowercase_check is None:
+        lowercase_check = utils.confirm(input("Do you want lowercase characters? y/n: "))
+
+    uppercase_check = None
+
+    while uppercase_check is None:
+        uppercase_check = utils.confirm(input("Do you want uppercase characters? y/n: "))
+
+    digit_check = None
+
+    while digit_check is None:
+        digit_check = utils.confirm(input("Do you want digits? y/n: "))
+
+    symbol_check = None
+
+    while symbol_check is None:
+        symbol_check = utils.confirm(input("Do you want symbols? y/n: "))
+
+    if lowercase_check is False and uppercase_check is False and symbol_check is False and digit_check is False:
+        print("Not selected anything. Returning to menu")
+    else:
+        password_string = ""
+
+        possible_strings = []
+        if lowercase_check:
+            possible_strings.append(string.ascii_lowercase)
+
+        if uppercase_check:
+            possible_strings.append(string.ascii_uppercase)
+
+        if digit_check:
+            possible_strings.append(string.digits)
+
+        if symbol_check:
+            possible_strings.append(string.punctuation)
+
+        for i in range(length_of_password):
+            password_string += random.choice(random.choices(possible_strings)[0])
+
+        print(f"Password generated: {password_string}")
+
+    input("\nEnter to continue")
+
+
+"""
+######################################### Database wrapper functions #########################################
+"""
 
 
 def show_database_entries():
@@ -143,67 +223,6 @@ def create_database_entry():
     database.add_password()
 
 
-def password_generator():
-    """
-    Generates a password and printing it on the screen for the user to use
-    :return:
-    """
-    length_of_password = 0
-
-    while length_of_password == 0:
-        print("After specifying some options your generated password will be given to you.\n")
-        try:
-            length_of_password = int(input("Enter the length of your password: "))
-        except ValueError:
-            print("Invalid input! Try again.\n")
-            continue
-
-    lowercase_check = None
-
-    while lowercase_check is None:
-        lowercase_check = db_manager.confirm(input("Do you want lowercase characters? y/n: "))
-
-    uppercase_check = None
-
-    while uppercase_check is None:
-        uppercase_check = db_manager.confirm(input("Do you want uppercase characters? y/n: "))
-
-    digit_check = None
-
-    while digit_check is None:
-        digit_check = db_manager.confirm(input("Do you want digits? y/n: "))
-
-    symbol_check = None
-
-    while symbol_check is None:
-        symbol_check = db_manager.confirm(input("Do you want symbols? y/n: "))
-
-    if lowercase_check is False and uppercase_check is False and symbol_check is False and digit_check is False:
-        print("Not selected anything. Returning to menu")
-    else:
-        password_string = ""
-
-        possible_strings = []
-        if lowercase_check:
-            possible_strings.append(string.ascii_lowercase)
-
-        if uppercase_check:
-            possible_strings.append(string.ascii_uppercase)
-
-        if digit_check:
-            possible_strings.append(string.digits)
-
-        if symbol_check:
-            possible_strings.append(string.punctuation)
-
-        for i in range(length_of_password):
-            password_string += random.choice(random.choices(possible_strings)[0])
-
-        print(f"Password generated: {password_string}")
-
-    input("\nEnter to continue")
-
-
 def modify_database_entry():
     """
     This is the wrapper function for database.modify_entry() since database has to be set in order for this to work
@@ -217,6 +236,25 @@ def modify_database_entry():
     database.modify_entry()
 
 
+def delete_database_entry():
+    """
+    Wrapper function for database.delete_entry() since database hast to be set
+    :return:
+    """
+    global database
+    if not isinstance(database, db_manager.Database):
+        print("Database not initialized yet! Please select a database to read from from the database menu!")
+        input("\nEnter to continue")
+        return
+
+    database.delete_entry()
+
+
+"""
+######################################### About #########################################
+"""
+
+
 def about():
     """
     Some about info
@@ -226,6 +264,10 @@ def about():
     print("Github: https://github.com/DestinyofYeet/PasswordManager")
     input("\nEnter to continue")
 
+
+"""
+######################################### 'Main' Code #########################################
+"""
 
 if __name__ == '__main__':
 
@@ -240,6 +282,7 @@ if __name__ == '__main__':
     password_stuff.append_item(FunctionItem("Show all stored entries", show_database_entries))
     password_stuff.append_item(FunctionItem("Add database entry", create_database_entry))
     password_stuff.append_item(FunctionItem("Modify database entry", modify_database_entry))
+    password_stuff.append_item(FunctionItem("Delete database entry", delete_database_entry))
     password_stuff.append_item(FunctionItem("Password generator", password_generator))
 
     # Creates the submenu 'Database menu'
@@ -256,4 +299,3 @@ if __name__ == '__main__':
     menu.append_item(password_stuff_submenu)
     menu.append_item(FunctionItem("About", about))
     menu.show(True)
-
