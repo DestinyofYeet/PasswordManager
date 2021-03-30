@@ -3,8 +3,9 @@ from consolemenu import ConsoleMenu
 import json
 import string
 import random
-
 import os
+import pathlib
+import sys
 
 from utils import db_manager
 from utils import utils
@@ -19,20 +20,21 @@ database = None
 
 def register_database(database_path):
     # stores the saved paths in %appdata%\.pwmanager\registers.json
-    path = os.getenv("appdata")
+
+    path = str(pathlib.Path(__file__).parent.absolute()) + "\\data"
     # if it doesn't exist, create it
-    if not os.path.exists(f"{path}\\.pwmanager\\"):
-        os.mkdir(f"{path}\\.pwmanager\\")
-        with open(f"{path}\\.pwmanager\\register.json", "w+") as f:
+    if not os.path.exists(path):
+        os.mkdir(path)
+        with open(f"{path}\\register.json", "w+") as f:
             json.dump({1: database_path}, f, indent=2)
         return
     # if register.json doesn't exist, create it
-    if not os.path.exists(f"{path}\\.pwmanager\\register.json"):
+    if not os.path.exists(f"{path}\\register.json"):
         with open(f"{path}\\.pwmanager\\register.json", "w+") as f:
             json.dump({1: database_path}, f, indent=2)
         return
 
-    with open(f"{path}\\.pwmanager\\register.json") as f:
+    with open(f"{path}\\register.json") as f:
         file = json.load(f)
 
     # checks for double entries
@@ -42,7 +44,7 @@ def register_database(database_path):
 
     file[len(file.keys()) + 1] = database_path
 
-    with open(f"{path}\\.pwmanager\\register.json", "w") as f:
+    with open(f"{path}\\register.json", "w") as f:
         json.dump(file, f, indent=2)
 
 
@@ -51,7 +53,7 @@ def database_enable():
     This will 'select' a database for use
     """
     global database
-    path = os.getenv("appdata") + "\\.pwmanager\\register.json"
+    path = str(pathlib.Path(__file__).parent.absolute()) + "\\data\\register.json"
     if not os.path.exists(path):
         print("You need to create a database first!")
         input("\nEnter to continue")
