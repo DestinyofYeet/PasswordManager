@@ -19,13 +19,21 @@ Download
 
 2. Then install the dependencies
 
-
+     
+    On Windows:
     $ py -3.x -m pip intall -r requirements.txt
+    
+    On Linux:
+    $ python3 -m pip install -r requirements.txt
 
 3. Starting the program is also very simple
 
-    
+
+    On windows:
     $ py -3.x main.py
+    
+    On Linux:
+    $ python3 main.py
 
 
 
