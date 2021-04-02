@@ -15,7 +15,8 @@ Download
 1. First clone the repository to your desired location
    
 
-    $ git clone https://github.com/DestinyofYeet/PasswordManager.git
+         $ git clone https://github.com/DestinyofYeet/PasswordManager.git
+
 
 2. Then install the dependencies
 
