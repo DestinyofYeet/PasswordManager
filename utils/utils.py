@@ -84,8 +84,10 @@ def __generate_database__(password, filepath) -> bool:
 
     with open(filepath + ".salt", "wb+") as f:
         f.write(salt)
-
-    print(f"Created .db file in '{filepath}'")
+    if sys.platform.startswith("win"):
+        print(f"Created .db file in '{filepath.rsplit('/')[0]}\\database.db'")
+    else:
+        print(f"Created .db file in '{filepath}'")
     return True
 
 
