@@ -1,4 +1,5 @@
 import os
+import sys
 
 from cryptography.fernet import Fernet
 from stdiomask import getpass
@@ -32,7 +33,10 @@ def clear_screen() -> None:
     """
     Clears the screen. Will be expanded to also be usable on linux
     """
-    os.system("cls")
+    if sys.platform.startswith("win"):
+        os.system("cls")
+    else:
+        os.system("clear")
 
 
 def create_database(filepath=os.path.abspath('databases/database.db')) -> None:

@@ -40,4 +40,3 @@ def encrypt_file(key, filepath) -> None:
 
     with open(filepath, 'wb') as f:
         f.write(encrypted_file)
-
