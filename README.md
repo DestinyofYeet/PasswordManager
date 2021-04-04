@@ -5,7 +5,7 @@ Password Manager
 ### How to use
 
 A few things to be noted before you get started.
-* The project is available on windows and linux, but i didn't confirm linux yet, although there should be nothing stopping it from running there.
+* The project is available on windows and linux
 * You don't need any specific python version. As long as the dependencies install you're fine.
 * Note that with time the numbers for the different options could change. I'd suggest you watch out for the options name and not the number.
 
