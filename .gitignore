@@ -1,6 +1,7 @@
-.idea
+.idea/
 utils/__pycache__/
-.github
+.github/
 __pycache__
-data
+data/
 __pycache__/
+venv/

@@ -23,10 +23,10 @@ class Database:
             sys.stdout.write("Correct! Proceeding\n")
             sys.stdout.flush()
         else:
-            sys.stdout.write("Password is incorrect! Exiting\n")
+            sys.stdout.write("Password is incorrect!\n")
             sys.stdout.flush()
             input("Enter to continue")
-            exit(1)
+            return
 
     def __check_password__(self) -> bool:
         """
@@ -63,7 +63,8 @@ class Database:
         This will add a entry in the database
         :return:
         """
-        print("If you type in 'q' or 'quit' in the 'Website or usage' field, the program will abort the adding and go back to the menu\n")
+        print("If you type in 'q' or 'quit' in the 'Website or usage' field, the program will abort the adding and"
+              " go back to the menu\n")
         website_or_usage = input("Website or usage: ")
         if utils.should_quit(website_or_usage):
             return
@@ -95,7 +96,8 @@ class Database:
         try:
             _ = passwords[website_or_usage]
             while True:
-                check = input(f"There is already an entry titled '{website_or_usage}', are you sure you want to overwrite it? y/n: ")
+                check = input(f"There is already an entry titled '{website_or_usage}', are you sure you want to "
+                              f"overwrite it? y/n: ")
                 if check.lower() in ['n', 'no']:
                     print("Aborting")
                     return
@@ -142,7 +144,8 @@ class Database:
             return
         # infinite loop for looking up multiple things
         while True:
-            print("You will now be listed all entries of your database. To get more information on one write the title of it in the console and press enter. Type in 'quit' to get back to the menu")
+            print("You will now be listed all entries of your database. To get more information on one write the title "
+                  "of it in the console and press enter. Type in 'quit' to get back to the menu")
             self.real_show_all_entries()
             more_information_on = input("More information on: ").strip()
             if more_information_on:
@@ -187,7 +190,8 @@ class Database:
             input("\nEnter to continue")
             return
         while True:
-            print("You will now be listed all entries of your database. Select one and copy it below to modify it. Type in 'quit' to get back to the menu")
+            print("You will now be listed all entries of your database. Select one and copy it below to modify it. "
+                  "Type in 'quit' to get back to the menu")
             self.real_show_all_entries()
             entry_to_modify = input("Entry to modify: ")
             if utils.should_quit(entry_to_modify):
@@ -200,7 +204,7 @@ class Database:
                     print(f"Title: {entry_to_modify}")
                     print(f"Username: {entry_to_modify_entry['username']}")
                     print(f"Description: {entry_to_modify_entry['description']}")
-                    print(f"Password: {len(entry_to_modify_entry['password'])*'*'}")
+                    print(f"Password: {len(entry_to_modify_entry['password']) * '*'}")
                     print("\nNew Entry:\n")
                     new_title = input(f"New title: ")
                     new_username = input(f"New username: ")
@@ -225,7 +229,8 @@ class Database:
                     if new_password:
                         print("Passwords match")
 
-                    title_gets_updated = False  # use of an extra variable to keep the modification in order: 1. Title 2. username etc...
+                    title_gets_updated = False
+                    # use of an extra variable to keep the modification in order: 1. Title 2. username etc..
 
                     if new_title:
                         check = None
@@ -304,7 +309,8 @@ class Database:
         while True:
             if not utils.has_entries(entries):
                 return
-            print("You will now be listed all entries of your database. Select one and copy it below to delete it. Type in 'quit' to get back to the menu")
+            print("You will now be listed all entries of your database. Select one and copy it below to delete it."
+                  " Type in 'quit' to get back to the menu")
             self.real_show_all_entries()
             print()
 
