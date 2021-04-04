@@ -22,7 +22,7 @@ Download
 
      
     On Windows:
-    `py -3.x -m pip intall -r requirements.txt`
+    `py -3.x -m pip install -r requirements.txt`
     
     On Linux:
     `python3 -m pip install -r requirements.txt`
