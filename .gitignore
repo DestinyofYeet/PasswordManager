@@ -3,3 +3,4 @@ utils/__pycache__/
 .github
 __pycache__
 data
+__pycache__/
