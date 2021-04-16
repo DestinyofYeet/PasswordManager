@@ -5,7 +5,7 @@ Password Manager
 ### How to use
 
 A few things to be noted before you get started.
-* The project is available on windows and linux
+* The project is available on Windows and Linux
 * You don't need any specific python version. As long as the dependencies install you're fine.
 * Note that with time the numbers for the different options could change. I'd suggest you watch out for the options name and not the number.
 
@@ -64,7 +64,7 @@ After starting the program, you are greeted with this screen.
   >>
 ```
 
-To create a database we are going to switch to the 'Database menu'
+To create a database, we are going to switch to the 'Database menu'
 
 ```
   ┌─────────────────────────────────────────────────────────────────────────┐
@@ -95,7 +95,7 @@ As the program tells you, you can always exit out of any option by inputting 'qu
 
 Here you can provide a new path to a folder where you want to have your database stored.
 
-In this guide, I will have my path in `C:\Users\Admin\Database\` but you are free to put it else where. Just note that 
+In this guide, I will have my path in `C:\Users\Admin\Database\` but you are free to put it elsewhere. Just note that 
 as of now, the script can only create a one-layer folder, for example it could create `C:\Users\Admin\Database` but not 
 `C:\Users\Admin\Database\Database` since only the Admin, which is my user folder, exists.
 
@@ -119,7 +119,7 @@ Say 'y' and hit enter.
 Then you need to specify a password for your database. Note that this is the password which you need to view all of your
 other passwords so choose one which is strong and which you can remember easily or write it on a piece of paper and secure it.
 
-After creating a database you will get thrown back in the 'Database menu'.
+After creating a database, you will get thrown back in the 'Database menu'.
 
 Now you have successfully created a database with password.
 
@@ -182,7 +182,7 @@ Once you got your database selected, hit the 4 to exit out of the 'Database menu
 
 From the main menu hit the 2 for the 'Passwordmanager menu'.
 
-Since you now have the database selected you can now create an entry!
+Since you now have the database selected, you can now create an entry!
 
 ```
   ┌─────────────────────────────────────────────────────────────────────────┐
@@ -262,7 +262,7 @@ After confirming said password, it will be added to your database. Press enter t
 Viewing passwords
 ----------------
 
-To view a password, you have to be in the 'Passwordmaanger menu'. Then hit the 1 'Show all stored entries'.
+To view a password, you have to be in the 'Passwordmanager menu'. Then hit the 1 'Show all stored entries'.
 ```
   ┌─────────────────────────────────────────────────────────────────────────┐
   │                                                                         │
@@ -293,7 +293,7 @@ You will now be listed all entries of your database. To get more information on 
 More information on:
 ```
 
-Now to see the other information you put in earlier, just copy whatever you want to see in the 'More information on: ' field.
+Now to see the other information, you put in earlier, just copy whatever you want to see in the 'More information on: ' field.
 
 ```
 You will now be listed all entries of your database. To get more information on one write the title of it in the console and press enter. Type in 'quit' to get back to the menu
@@ -388,7 +388,7 @@ Entry to modify: https://example.com
 ```
 Then I hit enter.
 
-It's just like the progam says, if you want to change something, write it in the corresponding field. If not just hit enter on the field and leave it blank.
+It's just like the program says, if you want to change something, write it in the corresponding field. If not just hit enter on the field and leave it blank.
 ```
 You will now be listed all entries of your database. Select one and copy it below to modify it. Type in 'quit' to get back to the menu
 
