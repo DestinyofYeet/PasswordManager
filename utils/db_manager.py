@@ -22,6 +22,7 @@ class Database:
         if self.__check_password__():
             sys.stdout.write("Correct! Proceeding\n")
             sys.stdout.flush()
+            print("Database selected!")
         else:
             sys.stdout.write("Password is incorrect!\n")
             sys.stdout.flush()
@@ -71,15 +72,15 @@ class Database:
 
         # assures a key so that it can't be emtpy
         while not website_or_usage:
-            website_or_usage = input("Website or usage: ")
-        username = input("Username: ")
-        description = input("Description: ")
+            website_or_usage = input("Website or usage: ").strip()
+        username = input("Username: ").strip()
+        description = input("Description: ").strip()
         while True:
             password = getpass("Password (will be hidden): ")
             password_confirm = getpass("Confirm password: ")
 
             if password != password_confirm:
-                check = input("Passwords are not the same! Do you want to re-enter both passwords? y/n: ")
+                check = input("Passwords are not the same! Do you want to re-enter both passwords? y/n: ").strip()
                 if check.lower().strip() in ['y', 'yes']:
                     continue
 
@@ -155,7 +156,11 @@ class Database:
                     try:
                         more_info_entry = entries[more_information_on]
                         print(f"Username: {more_info_entry['username']}")
-                        print(f"Description: {more_info_entry['description']}")
+                        try:
+                            description = more_info_entry["description"]
+                        except KeyError:
+                            description = None
+                        print(f"Description: {description}")
                         print()
                         show_password = input("Show password? y/n: ")
                         print()
@@ -206,10 +211,10 @@ class Database:
                     print(f"Description: {entry_to_modify_entry['description']}")
                     print(f"Password: {len(entry_to_modify_entry['password']) * '*'}")
                     print("\nNew Entry:\n")
-                    new_title = input(f"New title: ")
-                    new_username = input(f"New username: ")
-                    new_description = input(f"New description: ")
-                    new_password = getpass("New password: ")
+                    new_title = input(f"New title: ").strip()
+                    new_username = input(f"New username: ").strip()
+                    new_description = input(f"New description: ").strip()
+                    new_password = getpass("New password: ").strip()
                     confirm_new_password = ""
                     if new_password:
                         confirm_new_password = getpass("Confirm new password: ")

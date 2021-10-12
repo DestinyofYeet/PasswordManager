@@ -19,7 +19,6 @@ database = None
 
 
 def register_database(database_path):
-    # stores the saved paths in %appdata%\.pwmanager\registers.json
 
     path = str(pathlib.Path(__file__).parent.absolute()) + "/data"
     # if it doesn't exist, create it
@@ -82,7 +81,6 @@ def database_enable():
                 register_database(select_database)
             database_path = select_database + "/database.db"
             database = db_manager.Database(database_path)
-            print("Database selected!")
             break
     input("\nEnter to continue")
 
