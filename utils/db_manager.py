@@ -8,6 +8,9 @@ import os
 import sys
 import json
 
+from YeetsMenu.Menu import Menu
+from YeetsMenu.utils.option import Option
+
 
 class Database:
     def __init__(self, db_path=os.path.abspath('databases/database.db')):
@@ -17,17 +20,20 @@ class Database:
         """
         self.db_path = db_path
         self.password = getpass(prompt="Input your database password: ")
+
+        self.is_init = False
         sys.stdout.write("Checking password...")
         sys.stdout.flush()
         if self.__check_password__():
             sys.stdout.write("Correct! Proceeding\n")
             sys.stdout.flush()
             print("Database selected!")
+            self.is_init = True
         else:
             sys.stdout.write("Password is incorrect!\n")
             sys.stdout.flush()
             input("Enter to continue")
-            return
+            self.is_init = False
 
     def __check_password__(self) -> bool:
         """
@@ -132,7 +138,26 @@ class Database:
             print(f"- {i}")
         print()
 
-    def show_all_entries(self) -> None:
+    @staticmethod
+    def show_more_information_on(key, entries) -> None:
+        more_info_entry = entries[key]
+        print(f"Usage: {key}")
+        print(f"Username: {more_info_entry['username']}")
+        try:
+            description = more_info_entry["description"]
+        except KeyError:
+            description = None
+        print(f"Description: {description}")
+        print()
+        show_password = input("Show password? y/n: ")
+        print()
+        if show_password.lower() == 'y':
+            print(f"Password: {more_info_entry['password']}")
+        else:
+            print(f"Password will remain hidden")
+        print()
+
+    def show_all_entries(self, func) -> None:
         """
         Can more specifics about a dataset, like username, description and password
         :return:
@@ -143,39 +168,14 @@ class Database:
             print("No entries yet! Go create some.")
             input("\nEnter to continue")
             return
+
         # infinite loop for looking up multiple things
-        while True:
-            print("You will now be listed all entries of your database. To get more information on one write the title "
-                  "of it in the console and press enter. Type in 'quit' to get back to the menu")
-            self.real_show_all_entries()
-            more_information_on = input("More information on: ").strip()
-            if more_information_on:
-                if utils.should_quit(more_information_on):
-                    break
-                else:
-                    try:
-                        more_info_entry = entries[more_information_on]
-                        print(f"Username: {more_info_entry['username']}")
-                        try:
-                            description = more_info_entry["description"]
-                        except KeyError:
-                            description = None
-                        print(f"Description: {description}")
-                        print()
-                        show_password = input("Show password? y/n: ")
-                        print()
-                        if show_password.lower() == 'y':
-                            print(f"Password: {more_info_entry['password']}")
-                        else:
-                            print(f"Password will remain hidden")
-                        print()
-                        input("Press enter to continue")
+        password_menu = Menu("Select a password")
 
-                    except KeyError:
-                        print("You don't have an entry with that title!")
-                        input("\nPress enter to continue")
+        for passwd in sorted(entries.keys()):
+            password_menu.add_selectable(Option(passwd, func, passwd, entries))
 
-            utils.clear_screen()
+        password_menu.run()
 
     def get_path(self) -> str:
         """
@@ -184,172 +184,124 @@ class Database:
         """
         return self.db_path
 
-    def modify_entry(self) -> None:
+    def modify_entry(self, key, entries) -> None:
         """
         Allows a modification of an entry
         :return:
         """
-        entries = json.loads(decryptor.get_decrypted_content(self.password, self.db_path))
-        if len(entries.keys()) == 0:
-            print("No entries yet! Go create some.")
-            input("\nEnter to continue")
-            return
-        while True:
-            print("You will now be listed all entries of your database. Select one and copy it below to modify it. "
-                  "Type in 'quit' to get back to the menu")
-            self.real_show_all_entries()
-            entry_to_modify = input("Entry to modify: ")
-            if utils.should_quit(entry_to_modify):
-                break
-            if entry_to_modify:
-                try:
-                    entry_to_modify_entry = entries[entry_to_modify]
-                    print("\nIf you want to change something, write it. If not just press enter\n")
-                    print("Old entry:\n")
-                    print(f"Title: {entry_to_modify}")
-                    print(f"Username: {entry_to_modify_entry['username']}")
-                    print(f"Description: {entry_to_modify_entry['description']}")
-                    print(f"Password: {len(entry_to_modify_entry['password']) * '*'}")
-                    print("\nNew Entry:\n")
-                    new_title = input(f"New title: ").strip()
-                    new_username = input(f"New username: ").strip()
-                    new_description = input(f"New description: ").strip()
-                    new_password = getpass("New password: ").strip()
-                    confirm_new_password = ""
-                    if new_password:
-                        confirm_new_password = getpass("Confirm new password: ")
+        entry_to_modify_entry = entries[key]
+        print("\nIf you want to change something, write it. If not just press enter\n")
+        print("Old entry:\n")
+        print(f"Title: {key}")
+        print(f"Username: {entry_to_modify_entry['username']}")
+        print(f"Description: {entry_to_modify_entry['description']}")
+        print(f"Password: {len(entry_to_modify_entry['password']) * '*'}")
+        print("\nNew Entry:\n")
+        new_title = input(f"New title: ").strip()
+        new_username = input(f"New username: ").strip()
+        new_description = input(f"New description: ").strip()
+        new_password = getpass("New password: ").strip()
+        confirm_new_password = ""
+        if new_password:
+            confirm_new_password = getpass("Confirm new password: ")
 
-                    # checks till a) passwords are the same or b) user didn't want to change the passwords
-                    while new_password != confirm_new_password:
-                        check = input("The passwords don't match. Do you want to re-enter both? y/n: ")
-                        check = utils.confirm(check)
-                        if isinstance(check, bool):
-                            if check is False:
-                                new_password = ""
-                                print("Ignoring new password")
-                            else:
-                                new_password = getpass("New password: ")
-                                confirm_new_password = getpass("Confirm new password: ")
+        # checks till a) passwords are the same or b) user didn't want to change the passwords
+        while new_password != confirm_new_password:
+            check = input("The passwords don't match. Do you want to re-enter both? y/n: ")
+            check = utils.confirm(check)
+            if isinstance(check, bool):
+                if check is False:
+                    new_password = ""
+                    print("Ignoring new password")
+                else:
+                    new_password = getpass("New password: ")
+                    confirm_new_password = getpass("Confirm new password: ")
 
-                    if new_password:
-                        print("Passwords match")
+        if new_password:
+            print("Passwords match")
 
-                    title_gets_updated = False
-                    # use of an extra variable to keep the modification in order: 1. Title 2. username etc..
+        title_gets_updated = False
+        # use of an extra variable to keep the modification in order: 1. Title 2. username etc..
 
-                    if new_title:
-                        check = None
-                        while check is None:
-                            check = input("Are you sure to update the title? y/n: ")
-                            check = utils.confirm(check)
-                        if check is True:
-                            title_gets_updated = True
-                            entries[new_title] = entries[entry_to_modify]
-                            del entries[entry_to_modify]
-                            print("Title got updated")
-                        else:
-                            print("Did not update title")
-                        print()
+        if new_title:
+            check = None
+            while check is None:
+                check = input("Are you sure to update the title? y/n: ")
+                check = utils.confirm(check)
+            if check is True:
+                title_gets_updated = True
+                entries[new_title] = entries[key]
+                del entries[key]
+                print("Title got updated")
+            else:
+                print("Did not update title")
+            print()
 
-                    if new_username:
-                        check = None
-                        while check is None:
-                            check = input("Are you sure to update the username? y/n: ")
-                            check = utils.confirm(check)
-                        if check is True:
-                            if not title_gets_updated:
-                                entry_to_modify_entry['username'] = new_username
-                            else:
-                                entries[new_title]['username'] = new_username
-                            print("Updated username")
-                        else:
-                            print("Did not update username")
-                        print()
+        if new_username:
+            check = None
+            while check is None:
+                check = input("Are you sure to update the username? y/n: ")
+                check = utils.confirm(check)
+            if check is True:
+                if not title_gets_updated:
+                    entry_to_modify_entry['username'] = new_username
+                else:
+                    entries[new_title]['username'] = new_username
+                print("Updated username")
+            else:
+                print("Did not update username")
+            print()
 
-                    if new_description:
-                        check = None
-                        while check is None:
-                            check = input("Are you sure to update the description? y/n: ")
-                            check = utils.confirm(check)
-                        if check is True:
-                            if not title_gets_updated:
-                                entry_to_modify_entry['description'] = new_description
-                            else:
-                                entries[new_title]['description'] = new_description
-                            print("Updated description")
-                        else:
-                            print("Did not update description")
-                        print()
+        if new_description:
+            check = None
+            while check is None:
+                check = input("Are you sure to update the description? y/n: ")
+                check = utils.confirm(check)
+            if check is True:
+                if not title_gets_updated:
+                    entry_to_modify_entry['description'] = new_description
+                else:
+                    entries[new_title]['description'] = new_description
+                print("Updated description")
+            else:
+                print("Did not update description")
+            print()
 
-                    if new_password:
-                        check = None
-                        while check is None:
-                            check = input("Are you sure to update the password? y/n: ")
-                            check = utils.confirm(check)
-                        if check is True:
-                            if not title_gets_updated:
-                                entry_to_modify_entry['password'] = new_password
-                            else:
-                                entries[new_title]['password'] = new_password
-                            print("Updated password")
-                        else:
-                            print("Did not update password")
-                        print()
+        if new_password:
+            check = None
+            while check is None:
+                check = input("Are you sure to update the password? y/n: ")
+                check = utils.confirm(check)
+            if check is True:
+                if not title_gets_updated:
+                    entry_to_modify_entry['password'] = new_password
+                else:
+                    entries[new_title]['password'] = new_password
+                print("Updated password")
+            else:
+                print("Did not update password")
+            print()
 
-                    self.__save_file__(entries)
-                    print(f"\nUpdated entry: {entry_to_modify}\n")
+        self.__save_file__(entries)
+        print(f"\nUpdated entry: {key}\n")
 
-                except KeyError:
-                    print("You don't have a entry titled like that!")
-
-                input("\nEnter to continue")
-                utils.clear_screen()
-
-    def delete_entry(self) -> None:
+    def delete_entry(self, key, entries) -> None:
         """
         This function has the ability to delete an entry
         :return:
         """
-        entries = json.loads(decryptor.get_decrypted_content(self.password, self.db_path))
-        while True:
-            if not utils.has_entries(entries):
-                return
-            print("You will now be listed all entries of your database. Select one and copy it below to delete it."
-                  " Type in 'quit' to get back to the menu")
-            self.real_show_all_entries()
-            print()
+        print("\nEntry:\n")
+        print(f"Username: {entries[key]['username']}")
+        print(f"Description: {entries[key]['description']}")
+        print(f"Password: {len(entries[key]['password']) * '*'}\n")
 
-            entry_to_delete = input("Entry to delete: ")
-            if not entry_to_delete:
-                utils.clear_screen()
-                continue
+        check = None
+        while check is None:
+            check = utils.confirm(input(f"Are you sure you want to delete the entry '{key}'? y/n: "))
 
-            if utils.should_quit(entry_to_delete):
-                return
-
-            try:
-                entries[entry_to_delete]
-            except KeyError:
-                print("You don't have an entry named like that!")
-                input("\nEnter to continue")
-                utils.clear_screen()
-                continue
-
-            print("\nEntry:\n")
-            print(f"Username: {entries[entry_to_delete]['username']}")
-            print(f"Description: {entries[entry_to_delete]['description']}")
-            print(f"Password: {len(entries[entry_to_delete]['password']) * '*'}\n")
-
-            check = None
-            while check is None:
-                check = utils.confirm(input(f"Are you sure you want to delete the entry '{entry_to_delete}'? y/n: "))
-
-            if check:
-                del entries[entry_to_delete]
-                self.__save_file__(entries)
-                print("Entry has been deleted")
-            else:
-                print("Deletion has been aborted")
-
-            input("\nEnter to continue")
-            utils.clear_screen()
+        if check:
+            del entries[key]
+            self.__save_file__(entries)
+            print("Entry has been deleted")
+        else:
+            print("Deletion has been aborted")

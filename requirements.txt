@@ -1,3 +1,3 @@
 stdiomask~=0.0.6
-console-menu
-cryptography~=3.4.7
+YeetsMenu
+cryptography==35.0.0
